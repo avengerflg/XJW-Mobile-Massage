@@ -6,6 +6,8 @@ import 'forgot_password_screen.dart'; // Import the Forgot Password Screen
 import 'signup_screen.dart'; // Import the Signup Screen
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }

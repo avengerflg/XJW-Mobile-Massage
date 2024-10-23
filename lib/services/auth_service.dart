@@ -57,7 +57,7 @@ class AuthService {
       }
     } catch (e) {
       print('Signup error: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -90,7 +90,7 @@ class AuthService {
       }
     } catch (e) {
       print('Login error: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -118,7 +118,7 @@ class AuthService {
       }
     } catch (e) {
       print('Forgot password error: $e');
-      throw e;
+      rethrow;
     }
   }
 

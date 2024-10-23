@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/xjw_mobile_massage.iml" filepath="$PROJECT_DIR$/xjw_mobile_massage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/xjw_mobile_massage_android.iml" filepath="$PROJECT_DIR$/android/xjw_mobile_massage_android.iml" />
+    </modules>
+  </component>
+</project>
