@@ -36,4 +36,5 @@ flutter:
 
   assets:
     # Add any images or logos for splash screen or other UI elements
-    - assets/images/logo.png
+    - assets/masssage.webp
+    - assets/logo.png

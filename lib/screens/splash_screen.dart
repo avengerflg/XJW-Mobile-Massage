@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
-import 'home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'home_screen.dart';
+import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,27 +18,34 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateToNextScreen() async {
-    await Future.delayed(Duration(seconds: 3));
-
+    await Future.delayed(const Duration(seconds: 3));
     final prefs = await SharedPreferences.getInstance();
     final isLoggedIn = prefs.containsKey('user');
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => isLoggedIn ? HomeScreen() : LoginScreen(),
-      ),
-    );
+    if (isLoggedIn) {
+      // Retrieve the userId from SharedPreferences
+      final userId = prefs.getString('userId') ?? ''; // Fetch stored userId
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(userId: userId), // Pass userId
+        ),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text(
-          'XJW Mobile Massage',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+        child: Image.asset('assets/logo.png'), // Use your logo here
       ),
     );
   }

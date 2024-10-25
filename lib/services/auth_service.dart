@@ -6,7 +6,8 @@ import '../models/user_model.dart';
 class AuthService {
   final String baseUrl = "https://xjwmobilemassage.com.au/app/";
 
-  Future<UserModel?> signup({
+  // Signup method
+  Future<Map<String, dynamic>> signup({
     required String firstName,
     required String lastName,
     required String gender,
@@ -15,6 +16,7 @@ class AuthService {
     required String email,
     required String password,
     String? refCode,
+    required String auth,
   }) async {
     final url = Uri.parse('$baseUrl/api.php?apicall=signup');
     try {
@@ -29,49 +31,9 @@ class AuthService {
           'email': email,
           'pssword': password,
           'ref_code': refCode ?? '',
+          'auth': auth, // Include the auth code
         },
       ).timeout(Duration(seconds: 20), onTimeout: () {
-        throw Exception('Network timeout, please try again.');
-      });
-
-      print('Response body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        try {
-          final data = jsonDecode(response.body);
-
-          if (data['error'] == false) {
-            final user = UserModel.fromJson(data['user']);
-            await _saveUserToPrefs(user);
-            return user;
-          } else {
-            throw Exception(data['message'] ?? 'Signup failed');
-          }
-        } catch (e) {
-          print('JSON parsing error: $e');
-          print('Raw response: ${response.body}');
-          throw Exception('Unexpected response format.');
-        }
-      } else {
-        throw Exception('Server error: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Signup error: $e');
-      rethrow;
-    }
-  }
-
-  // Login Method
-  Future<UserModel?> login(String email, String password) async {
-    final url = Uri.parse('$baseUrl/api.php?apicall=signin');
-    try {
-      final response = await http.post(
-        url,
-        body: {
-          'email': email,
-          'pssword': password, // Ensure this matches your API parameter
-        },
-      ).timeout(Duration(seconds: 10), onTimeout: () {
         throw Exception('Network timeout, please try again.');
       });
 
@@ -81,16 +43,83 @@ class AuthService {
         if (data['error'] == false) {
           final user = UserModel.fromJson(data['user']);
           await _saveUserToPrefs(user);
+          return {
+            'error': false,
+            'user': user,
+          };
+        } else {
+          return {
+            'error': true,
+            'message': data['message'] ?? 'Signup failed',
+          };
+        }
+      } else {
+        return {
+          'error': true,
+          'message': 'Server error: ${response.statusCode}',
+        };
+      }
+    } catch (e) {
+      print('Signup error: $e');
+      return {
+        'error': true,
+        'message': e.toString(),
+      };
+    }
+  }
+
+  // Login Method
+  Future<UserModel> login(String email, String password) async {
+    final url = Uri.parse('$baseUrl/api.php?apicall=signin');
+    try {
+      final response = await http.post(
+        url,
+        body: {
+          'email': email,
+          'pssword': password,
+        },
+      ).timeout(Duration(seconds: 10), onTimeout: () {
+        throw Exception('Network timeout, please try again.');
+      });
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // Check for error in the response
+        if (data['error'] == false) {
+          final user = UserModel.fromJson(data['user']);
+          await _saveUserToPrefs(user);
           return user;
         } else {
-          throw Exception(data['message'] ?? 'Login failed');
+          // Return UserModel with error set to true
+          return UserModel(
+            id: '',
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            uid: '',
+            auth: '',
+            error: true,
+            message: data['message'] ?? 'Login failed',
+          );
         }
       } else {
         throw Exception('Server error: ${response.statusCode}');
       }
     } catch (e) {
       print('Login error: $e');
-      rethrow;
+      return UserModel(
+        id: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        uid: '',
+        auth: '',
+        error: true,
+        message: e.toString(),
+      );
     }
   }
 
@@ -109,7 +138,7 @@ class AuthService {
         final data = jsonDecode(response.body);
 
         if (data['error'] == false) {
-          return;
+          return; // Success, no need for further action
         } else {
           throw Exception(data['message'] ?? 'Password reset failed');
         }
